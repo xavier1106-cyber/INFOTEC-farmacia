@@ -1,7 +1,8 @@
 import { type IntlDateTimeFormats, createI18n } from 'vue-i18n';
 import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome';
-
 import { library } from '@fortawesome/fontawesome-svg-core';
+
+// --- IMPORTACIONES ESTÁNDAR ---
 import { faArrowLeft } from '@fortawesome/free-solid-svg-icons/faArrowLeft';
 import { faAsterisk } from '@fortawesome/free-solid-svg-icons/faAsterisk';
 import { faBan } from '@fortawesome/free-solid-svg-icons/faBan';
@@ -39,62 +40,72 @@ import { faUserPlus } from '@fortawesome/free-solid-svg-icons/faUserPlus';
 import { faUsers } from '@fortawesome/free-solid-svg-icons/faUsers';
 import { faUsersCog } from '@fortawesome/free-solid-svg-icons/faUsersCog';
 import { faWrench } from '@fortawesome/free-solid-svg-icons/faWrench';
+import { faCalendarAlt } from '@fortawesome/free-solid-svg-icons/faCalendarAlt';
+import { faBoxes } from '@fortawesome/free-solid-svg-icons/faBoxes';
+import { faDollyFlatbed } from '@fortawesome/free-solid-svg-icons/faDollyFlatbed';
+import { faCircle } from '@fortawesome/free-solid-svg-icons/faCircle';
 
-// NUEVOS ICONOS PARA SOLUCIONAR ERRORES EN CONSOLA
+// --- ICONOS PARA MÓDULOS DE INVENTARIO Y FARMACIA ---
 import { faUserMd } from '@fortawesome/free-solid-svg-icons/faUserMd';
 import { faHistory } from '@fortawesome/free-solid-svg-icons/faHistory';
 import { faCommentDots } from '@fortawesome/free-solid-svg-icons/faCommentDots';
+import { faFileMedical } from '@fortawesome/free-solid-svg-icons/faFileMedical';
+import { faPills } from '@fortawesome/free-solid-svg-icons/faPills';
+import { faFolderOpen } from '@fortawesome/free-solid-svg-icons/faFolderOpen';
+import { faExclamationCircle } from '@fortawesome/free-solid-svg-icons/faExclamationCircle';
+import { faCapsules } from '@fortawesome/free-solid-svg-icons/faCapsules';
+import { faBarcode } from '@fortawesome/free-solid-svg-icons/faBarcode';
+import { faMapMarkerAlt } from '@fortawesome/free-solid-svg-icons/faMapMarkerAlt';
+import { faLayerGroup } from '@fortawesome/free-solid-svg-icons/faLayerGroup';
+import { faCalendarCheck } from '@fortawesome/free-solid-svg-icons/faCalendarCheck';
+import { faShieldAlt } from '@fortawesome/free-solid-svg-icons/faShieldAlt';
+import { faCheckCircle } from '@fortawesome/free-solid-svg-icons/faCheckCircle';
+import { faExchangeAlt } from '@fortawesome/free-solid-svg-icons/faExchangeAlt';
+import { faTag } from '@fortawesome/free-solid-svg-icons/faTag';
+import { faArrowDown } from '@fortawesome/free-solid-svg-icons/faArrowDown';
+import { faArrowUp } from '@fortawesome/free-solid-svg-icons/faArrowUp';
+
+// --- ICONOS DE UI, GRÁFICAS Y ALERTAS ---
+import { faPlusCircle } from '@fortawesome/free-solid-svg-icons/faPlusCircle';
+import { faChartLine } from '@fortawesome/free-solid-svg-icons/faChartLine';
+import { faChartPie } from '@fortawesome/free-solid-svg-icons/faChartPie';
+import { faChartBar } from '@fortawesome/free-solid-svg-icons/faChartBar';
+import { faBoxOpen } from '@fortawesome/free-solid-svg-icons/faBoxOpen';
+import { faUserShield } from '@fortawesome/free-solid-svg-icons/faUserShield';
+import { faInfoCircle } from '@fortawesome/free-solid-svg-icons/faInfoCircle';
+import { faExclamationTriangle } from '@fortawesome/free-solid-svg-icons/faExclamationTriangle';
+import { faHourglassHalf } from '@fortawesome/free-solid-svg-icons/faHourglassHalf';
+import { faEyeSlash } from '@fortawesome/free-solid-svg-icons/faEyeSlash';
+import { faRedo } from '@fortawesome/free-solid-svg-icons/faRedo';
+
+// --- ICONOS ADICIONALES PARA FORMULARIOS Y GESTIÓN (RECIÉN AGREGADOS) ---
+import { faIdCard } from '@fortawesome/free-solid-svg-icons/faIdCard';
+import { faFingerprint } from '@fortawesome/free-solid-svg-icons/faFingerprint';
+import { faUserEdit } from '@fortawesome/free-solid-svg-icons/faUserEdit';
+import { faLanguage } from '@fortawesome/free-solid-svg-icons/faLanguage';
+import { faEnvelope } from '@fortawesome/free-solid-svg-icons/faEnvelope';
+
+// --- ICONOS DETECTADOS EN CONSOLA ---
+import { faBalanceScale } from '@fortawesome/free-solid-svg-icons/faBalanceScale';
+import { faShippingFast } from '@fortawesome/free-solid-svg-icons/faShippingFast';
+import { faLightbulb } from '@fortawesome/free-solid-svg-icons/faLightbulb';
+import { faCalendarTimes } from '@fortawesome/free-solid-svg-icons/faCalendarTimes';
+import { faClock } from '@fortawesome/free-solid-svg-icons/faClock';
+import { faClipboardCheck } from '@fortawesome/free-solid-svg-icons/faClipboardCheck';
+import { faUserInjured } from '@fortawesome/free-solid-svg-icons/faUserInjured';
+import { faFileInvoice } from '@fortawesome/free-solid-svg-icons/faFileInvoice';
+import { faPrint } from '@fortawesome/free-solid-svg-icons/faPrint';
 
 const datetimeFormats: IntlDateTimeFormats = {
   es: {
-    short: {
-      year: 'numeric',
-      month: 'short',
-      day: 'numeric',
-      hour: 'numeric',
-      minute: 'numeric',
-    },
-    medium: {
-      year: 'numeric',
-      month: 'short',
-      day: 'numeric',
-      weekday: 'short',
-      hour: 'numeric',
-      minute: 'numeric',
-    },
-    long: {
-      year: 'numeric',
-      month: 'long',
-      day: 'numeric',
-      weekday: 'long',
-      hour: 'numeric',
-      minute: 'numeric',
-    },
+    short: { year: 'numeric', month: 'short', day: 'numeric', hour: 'numeric', minute: 'numeric' },
+    medium: { year: 'numeric', month: 'short', day: 'numeric', weekday: 'short', hour: 'numeric', minute: 'numeric' },
+    long: { year: 'numeric', month: 'long', day: 'numeric', weekday: 'long', hour: 'numeric', minute: 'numeric' },
   },
   en: {
-    short: {
-      year: 'numeric',
-      month: 'short',
-      day: 'numeric',
-      hour: 'numeric',
-      minute: 'numeric',
-    },
-    medium: {
-      year: 'numeric',
-      month: 'short',
-      day: 'numeric',
-      weekday: 'short',
-      hour: 'numeric',
-      minute: 'numeric',
-    },
-    long: {
-      year: 'numeric',
-      month: 'long',
-      day: 'numeric',
-      weekday: 'long',
-      hour: 'numeric',
-      minute: 'numeric',
-    },
+    short: { year: 'numeric', month: 'short', day: 'numeric', hour: 'numeric', minute: 'numeric' },
+    medium: { year: 'numeric', month: 'short', day: 'numeric', weekday: 'short', hour: 'numeric', minute: 'numeric' },
+    long: { year: 'numeric', month: 'long', day: 'numeric', weekday: 'long', hour: 'numeric', minute: 'numeric' },
   },
 };
 
@@ -139,14 +150,53 @@ export function initFortAwesome(vue) {
     faUsers,
     faUsersCog,
     faWrench,
-    // REGISTRO DE ICONOS ADICIONALES
+    faCalendarAlt,
+    faBoxes,
+    faDollyFlatbed,
+    faCircle,
     faUserMd,
     faHistory,
     faCommentDots,
-    
-    faPlus,
-    faSave,
-    faBan
+    faFileMedical,
+    faPills,
+    faFolderOpen,
+    faExclamationCircle,
+    faCapsules,
+    faBarcode,
+    faMapMarkerAlt,
+    faLayerGroup,
+    faCalendarCheck,
+    faShieldAlt,
+    faCheckCircle,
+    faExchangeAlt,
+    faTag,
+    faArrowDown,
+    faArrowUp,
+    faPlusCircle,
+    faChartLine,
+    faChartPie,
+    faChartBar,
+    faBoxOpen,
+    faUserShield,
+    faInfoCircle,
+    faExclamationTriangle,
+    faHourglassHalf,
+    faEyeSlash,
+    faRedo,
+    faBalanceScale,
+    faShippingFast,
+    faLightbulb,
+    faCalendarTimes,
+    faClock,
+    faClipboardCheck,
+    faUserInjured,
+    faFileInvoice,
+    faPrint,
+    faIdCard,
+    faFingerprint,
+    faUserEdit,
+    faLanguage,
+    faEnvelope
   );
 }
 

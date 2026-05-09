@@ -1,195 +1,179 @@
 <template>
-  <div>
+  <div class="container-fluid py-5 bg-light-gray min-vh-100 bg-infotec-watermark">
     <div class="row justify-content-center">
-      <div class="col-md-8 toastify-container">
-        <h1 v-text="t$('register.title')" id="register-title" data-cy="registerTitle"></h1>
-
-        <div class="alert alert-success" role="alert" v-if="success" v-html="t$('register.messages.success')"></div>
-
-        <div class="alert alert-danger" role="alert" v-if="error" v-html="t$('register.messages.error.fail')"></div>
-
-        <div class="alert alert-danger" role="alert" v-if="errorUserExists" v-html="t$('register.messages.error.userexists')"></div>
-
-        <div class="alert alert-danger" role="alert" v-if="errorEmailExists" v-html="t$('register.messages.error.emailexists')"></div>
-      </div>
-    </div>
-    <div class="row justify-content-center">
-      <div class="col-md-8">
-        <form id="register-form" name="registerForm" @submit.prevent="register()" v-if="!success" no-validate>
-          <div class="form-group">
-            <label class="form-control-label" for="username" v-text="t$('global.form[\'username.label\']')"></label>
-            <input
-              type="text"
-              class="form-control"
-              v-model="v$.registerAccount.login.$model"
-              id="username"
-              name="login"
-              :class="{ valid: !v$.registerAccount.login.$invalid, invalid: v$.registerAccount.login.$invalid }"
-              required
-              minlength="1"
-              maxlength="50"
-              pattern="^[a-zA-Z0-9!#$&'*+=?^_`{|}~.-]+@?[a-zA-Z0-9-]+(?:\.[a-zA-Z0-9-]+)*$"
-              :placeholder="t$('global.form[\'username.placeholder\']')"
-              data-cy="username"
-            />
-            <div v-if="v$.registerAccount.login.$anyDirty && v$.registerAccount.login.$invalid">
-              <small
-                class="form-text text-danger"
-                v-if="!v$.registerAccount.login.required"
-                v-text="t$('register.messages.validate.login.required')"
-              ></small>
-              <small
-                class="form-text text-danger"
-                v-if="!v$.registerAccount.login.minLength"
-                v-text="t$('register.messages.validate.login.minlength')"
-              ></small>
-              <small
-                class="form-text text-danger"
-                v-if="!v$.registerAccount.login.maxLength"
-                v-text="t$('register.messages.validate.login.maxlength')"
-              ></small>
-              <small
-                class="form-text text-danger"
-                v-if="!v$.registerAccount.login.pattern"
-                v-text="t$('register.messages.validate.login.pattern')"
-              ></small>
-            </div>
+      <div class="col-md-6 col-lg-5">
+        <div
+          class="card border-0 shadow-lg register-card animate__animated animate__fadeIn"
+        >
+          <div class="card-header bg-vino text-white text-center py-4">
+            <font-awesome-icon icon="user-plus" size="2x" class="mb-2" />
+            <h2
+              class="font-weight-bold mb-0"
+              v-text="t$('register.title')"
+              id="register-title"
+            ></h2>
+            <p class="small mb-0 opacity-75">
+              Crea una nueva cuenta en el sistema INFOTEC
+            </p>
           </div>
-          <div class="form-group">
-            <label class="form-control-label" for="email" v-text="t$('global.form[\'email.label\']')"></label>
-            <input
-              type="email"
-              class="form-control"
-              id="email"
-              name="email"
-              :class="{ valid: !v$.registerAccount.email.$invalid, invalid: v$.registerAccount.email.$invalid }"
-              v-model="v$.registerAccount.email.$model"
-              minlength="5"
-              maxlength="254"
-              email
-              required
-              :placeholder="t$('global.form[\'email.placeholder\']')"
-              data-cy="email"
-            />
-            <div v-if="v$.registerAccount.email.$anyDirty && v$.registerAccount.email.$invalid">
-              <small
-                class="form-text text-danger"
-                v-if="!v$.registerAccount.email.required"
-                v-text="t$('global.messages.validate.email.required')"
-              ></small>
-              <small
-                class="form-text text-danger"
-                v-if="!v$.registerAccount.email.email"
-                v-text="t$('global.messages.validate.email.invalid')"
-              ></small>
-              <small
-                class="form-text text-danger"
-                v-if="!v$.registerAccount.email.minLength"
-                v-text="t$('global.messages.validate.email.minlength')"
-              ></small>
-              <small
-                class="form-text text-danger"
-                v-if="!v$.registerAccount.email.maxLength"
-                v-text="t$('global.messages.validate.email.maxlength')"
-              ></small>
+
+          <div class="card-body p-4 bg-white">
+            <div
+              class="alert alert-success shadow-sm text-center"
+              role="alert"
+              v-if="success"
+            >
+              <div v-html="t$('register.messages.success')"></div>
+              <hr />
+              <router-link
+                to="/"
+                class="btn btn-success btn-sm rounded-pill px-4 font-weight-bold"
+              >
+                VOLVER AL INICIO
+              </router-link>
             </div>
-          </div>
-          <div class="form-group">
-            <label class="form-control-label" for="firstPassword" v-text="t$('global.form[\'newpassword.label\']')"></label>
-            <input
-              type="password"
-              class="form-control"
-              id="firstPassword"
-              name="password"
-              :class="{ valid: !v$.registerAccount.password.$invalid, invalid: v$.registerAccount.password.$invalid }"
-              v-model="v$.registerAccount.password.$model"
-              minlength="4"
-              maxlength="50"
-              required
-              :placeholder="t$('global.form[\'newpassword.placeholder\']')"
-              data-cy="firstPassword"
-            />
-            <div v-if="v$.registerAccount.password.$anyDirty && v$.registerAccount.password.$invalid">
-              <small
-                class="form-text text-danger"
-                v-if="!v$.registerAccount.password.required"
-                v-text="t$('global.messages.validate.newpassword.required')"
-              ></small>
-              <small
-                class="form-text text-danger"
-                v-if="!v$.registerAccount.password.minLength"
-                v-text="t$('global.messages.validate.newpassword.minlength')"
-              ></small>
-              <small
-                class="form-text text-danger"
-                v-if="!v$.registerAccount.password.maxLength"
-                v-text="t$('global.messages.validate.newpassword.maxlength')"
-              ></small>
-            </div>
-          </div>
-          <div class="form-group">
-            <label class="form-control-label" for="secondPassword" v-text="t$('global.form[\'confirmpassword.label\']')"></label>
-            <input
-              type="password"
-              class="form-control"
-              id="secondPassword"
-              name="confirmPasswordInput"
-              :class="{ valid: !v$.confirmPassword.$invalid, invalid: v$.confirmPassword.$invalid }"
-              v-model="v$.confirmPassword.$model"
-              minlength="4"
-              maxlength="50"
-              required
-              :placeholder="t$('global.form[\'confirmpassword.placeholder\']')"
-              data-cy="secondPassword"
-            />
-            <div v-if="v$.confirmPassword.$dirty && v$.confirmPassword.$invalid">
-              <small
-                class="form-text text-danger"
-                v-if="!v$.confirmPassword.required"
-                v-text="t$('global.messages.validate.confirmpassword.required')"
-              ></small>
-              <small
-                class="form-text text-danger"
-                v-if="!v$.confirmPassword.minLength"
-                v-text="t$('global.messages.validate.confirmpassword.minlength')"
-              ></small>
-              <small
-                class="form-text text-danger"
-                v-if="!v$.confirmPassword.maxLength"
-                v-text="t$('global.messages.validate.confirmpassword.maxlength')"
-              ></small>
-              <small
-                class="form-text text-danger"
-                v-if="!v$.confirmPassword.sameAsPassword"
-                v-text="t$('global.messages.error.dontmatch')"
-              ></small>
-            </div>
-          </div>
-              <div class="form-group">
-                  <label class="form-control-label">Rol</label>
-                  <select
-                    class="form-control"
-                    v-model="registerAccount.authorities">
-                    <option disabled value="">Seleccione un rol</option>
-                    <option :value="['ROLE_MEDICO']">Médico</option>
-                    <option :value="['ROLE_FARMACEUTICO']">Farmacéutico</option>
-                    <option :value="['ROLE_ALMACEN']">Almacén</option>
-                  </select>
+
+            <div
+              class="alert alert-danger shadow-sm"
+              role="alert"
+              v-if="error"
+              v-html="t$('register.messages.error.fail')"
+            ></div>
+            <div
+              class="alert alert-danger shadow-sm"
+              role="alert"
+              v-if="errorUserExists"
+              v-html="t$('register.messages.error.userexists')"
+            ></div>
+            <div
+              class="alert alert-danger shadow-sm"
+              role="alert"
+              v-if="errorEmailExists"
+              v-html="t$('register.messages.error.emailexists')"
+            ></div>
+
+            <form
+              id="register-form"
+              name="registerForm"
+              @submit.prevent="register()"
+              v-if="!success"
+              no-validate
+            >
+              <div class="form-group mb-3">
+                <label
+                  class="form-control-label font-weight-bold small text-muted"
+                  for="username"
+                  v-text="t$('global.form[\'username.label\']')"
+                ></label>
+                <input
+                  type="text"
+                  class="form-control rounded-pill border-guinda-light"
+                  v-model="v$.registerAccount.login.$model"
+                  id="username"
+                  name="login"
+                  :class="{
+                    'is-invalid':
+                      v$.registerAccount.login.$invalid &&
+                      v$.registerAccount.login.$dirty,
+                  }"
+                  required
+                  :placeholder="t$('global.form[\'username.placeholder\']')"
+                />
+                <div
+                  v-if="
+                    v$.registerAccount.login.$anyDirty &&
+                    v$.registerAccount.login.$invalid
+                  "
+                  class="invalid-feedback ml-2"
+                >
+                  <small
+                    v-if="!v$.registerAccount.login.required"
+                    v-text="t$('register.messages.validate.login.required')"
+                  ></small>
+                </div>
               </div>
 
-          <button
-            type="submit"
-            :disabled="v$.$invalid"
-            class="btn btn-primary"
-            v-text="t$('register.form.button')"
-            data-cy="submit"
-          ></button>
-        </form>
-        <p></p>
-        <div class="alert alert-warning">
-          <span v-text="t$('global.messages.info.authenticated.prefix')"></span>
-          <a class="alert-link" @click="openLogin()" v-text="t$('global.messages.info.authenticated.link')"></a
-          ><span v-html="t$('global.messages.info.authenticated.suffix')"></span>
+              <div class="form-group mb-3">
+                <label
+                  class="form-control-label font-weight-bold small text-muted"
+                  for="email"
+                  v-text="t$('global.form[\'email.label\']')"
+                ></label>
+                <input
+                  type="email"
+                  class="form-control rounded-pill border-guinda-light"
+                  id="email"
+                  name="email"
+                  :class="{
+                    'is-invalid':
+                      v$.registerAccount.email.$invalid &&
+                      v$.registerAccount.email.$dirty,
+                  }"
+                  v-model="v$.registerAccount.email.$model"
+                  required
+                  :placeholder="t$('global.form[\'email.placeholder\']')"
+                />
+              </div>
+
+              <div class="row">
+                <div class="col-md-6 form-group mb-3">
+                  <label
+                    class="form-control-label font-weight-bold small text-muted"
+                    for="firstPassword"
+                    v-text="t$('global.form[\'newpassword.label\']')"
+                  ></label>
+                  <input
+                    type="password"
+                    class="form-control rounded-pill border-guinda-light"
+                    id="firstPassword"
+                    v-model="v$.registerAccount.password.$model"
+                    :class="{
+                      'is-invalid':
+                        v$.registerAccount.password.$invalid &&
+                        v$.registerAccount.password.$dirty,
+                    }"
+                    required
+                    :placeholder="t$('global.form[\'newpassword.placeholder\']')"
+                  />
+                </div>
+                <div class="col-md-6 form-group mb-3">
+                  <label
+                    class="form-control-label font-weight-bold small text-muted"
+                    for="secondPassword"
+                    >Confirmar contraseña</label
+                  >
+                  <input
+                    type="password"
+                    class="form-control rounded-pill border-guinda-light"
+                    id="secondPassword"
+                    v-model="v$.confirmPassword.$model"
+                    :class="{
+                      'is-invalid':
+                        v$.confirmPassword.$invalid && v$.confirmPassword.$dirty,
+                    }"
+                    required
+                    placeholder="••••••••"
+                  />
+                </div>
+              </div>
+
+              <button
+                type="submit"
+                :disabled="v$.$invalid"
+                class="btn btn-guinda btn-block rounded-pill shadow-sm font-weight-bold py-2 mb-3"
+              >
+                <font-awesome-icon icon="save" class="mr-2" />
+                <span v-text="t$('register.form.button')"></span>
+              </button>
+            </form>
+
+            <div class="alert alert-warning-custom text-center rounded-lg mt-3 py-2">
+              <span class="small">¿Ya tienes cuenta?</span>
+              <router-link to="/" class="alert-link small font-weight-bold ml-1">
+                Inicia sesión aquí
+              </router-link>
+            </div>
+          </div>
         </div>
       </div>
     </div>
@@ -197,3 +181,65 @@
 </template>
 
 <script lang="ts" src="./register.component.ts"></script>
+
+<style scoped>
+/* ESTILOS INSTITUCIONALES */
+.text-guinda {
+  color: #9b2247 !important;
+}
+.bg-vino {
+  background-color: #611232 !important;
+}
+.border-guinda-light {
+  border-color: #e2d1d6 !important;
+}
+.border-guinda-light:focus {
+  border-color: #9b2247 !important;
+  box-shadow: 0 0 0 0.2rem rgba(155, 34, 71, 0.1);
+}
+
+.btn-guinda {
+  background-color: #9b2247;
+  color: white;
+  border: none;
+  transition: 0.3s;
+}
+.btn-guinda:hover:not(:disabled) {
+  background-color: #611232;
+  transform: translateY(-2px);
+}
+.btn-guinda:disabled {
+  background-color: #cccccc;
+  cursor: not-allowed;
+}
+
+.register-card {
+  border-radius: 20px !important;
+  overflow: hidden;
+}
+
+.bg-infotec-watermark {
+  background-image: url("assets/fondo4.jpeg");
+  background-repeat: no-repeat;
+  background-position: center;
+  background-size: 55%;
+  background-attachment: fixed;
+}
+
+.alert-warning-custom {
+  background-color: #fff9e6;
+  border: 1px dashed #f39c12;
+  color: #856404;
+}
+
+.opacity-75 {
+  opacity: 0.75;
+}
+.is-invalid {
+  border-color: #dc3545 !important;
+}
+.invalid-feedback {
+  display: block;
+  font-size: 0.75rem;
+}
+</style>

@@ -1,212 +1,364 @@
 <template>
-  <div class="row justify-content-center">
-    <div class="col-8">
-      <form name="editForm" novalidate @submit.prevent="save()">
-        <h2
-          id="gatewayApp.inventarioInventario.home.createOrEditLabel"
-          data-cy="InventarioCreateUpdateHeading"
-          v-text="t$('gatewayApp.inventarioInventario.home.createOrEditLabel')"
-        ></h2>
-        <div>
-          <div class="form-group" v-if="inventario.id">
-            <label for="id" v-text="t$('global.field.id')"></label>
-            <input type="text" class="form-control" id="id" name="id" v-model="inventario.id" readonly />
-          </div>
-          <div class="form-group">
-            <label
-              class="form-control-label"
-              v-text="t$('gatewayApp.inventarioInventario.claveMedicamento')"
-              for="inventario-claveMedicamento"
-            ></label>
-            <input
-              type="text"
-              class="form-control"
-              name="claveMedicamento"
-              id="inventario-claveMedicamento"
-              data-cy="claveMedicamento"
-              :class="{ valid: !v$.claveMedicamento.$invalid, invalid: v$.claveMedicamento.$invalid }"
-              v-model="v$.claveMedicamento.$model"
-              required
-            />
-            <div v-if="v$.claveMedicamento.$anyDirty && v$.claveMedicamento.$invalid">
-              <small class="form-text text-danger" v-for="error of v$.claveMedicamento.$errors" :key="error.$uid">{{
-                error.$message
-              }}</small>
-            </div>
-          </div>
-          <div class="form-group">
-            <label class="form-control-label" v-text="t$('gatewayApp.inventarioInventario.nombre')" for="inventario-nombre"></label>
-            <input
-              type="text"
-              class="form-control"
-              name="nombre"
-              id="inventario-nombre"
-              data-cy="nombre"
-              :class="{ valid: !v$.nombre.$invalid, invalid: v$.nombre.$invalid }"
-              v-model="v$.nombre.$model"
-              required
-            />
-            <div v-if="v$.nombre.$anyDirty && v$.nombre.$invalid">
-              <small class="form-text text-danger" v-for="error of v$.nombre.$errors" :key="error.$uid">{{ error.$message }}</small>
-            </div>
-          </div>
-          <div class="form-group">
-            <label
-              class="form-control-label"
-              v-text="t$('gatewayApp.inventarioInventario.presentacion')"
-              for="inventario-presentacion"
-            ></label>
-            <input
-              type="text"
-              class="form-control"
-              name="presentacion"
-              id="inventario-presentacion"
-              data-cy="presentacion"
-              :class="{ valid: !v$.presentacion.$invalid, invalid: v$.presentacion.$invalid }"
-              v-model="v$.presentacion.$model"
-              required
-            />
-            <div v-if="v$.presentacion.$anyDirty && v$.presentacion.$invalid">
-              <small class="form-text text-danger" v-for="error of v$.presentacion.$errors" :key="error.$uid">{{ error.$message }}</small>
-            </div>
-          </div>
-          <div class="form-group">
-            <label class="form-control-label" v-text="t$('gatewayApp.inventarioInventario.lote')" for="inventario-lote"></label>
-            <input
-              type="text"
-              class="form-control"
-              name="lote"
-              id="inventario-lote"
-              data-cy="lote"
-              :class="{ valid: !v$.lote.$invalid, invalid: v$.lote.$invalid }"
-              v-model="v$.lote.$model"
-              required
-            />
-            <div v-if="v$.lote.$anyDirty && v$.lote.$invalid">
-              <small class="form-text text-danger" v-for="error of v$.lote.$errors" :key="error.$uid">{{ error.$message }}</small>
-            </div>
-          </div>
-          <div class="form-group">
-            <label class="form-control-label" v-text="t$('gatewayApp.inventarioInventario.cantidad')" for="inventario-cantidad"></label>
-            <input
-              type="number"
-              class="form-control"
-              name="cantidad"
-              id="inventario-cantidad"
-              data-cy="cantidad"
-              :class="{ valid: !v$.cantidad.$invalid, invalid: v$.cantidad.$invalid }"
-              v-model.number="v$.cantidad.$model"
-              required
-            />
-            <div v-if="v$.cantidad.$anyDirty && v$.cantidad.$invalid">
-              <small class="form-text text-danger" v-for="error of v$.cantidad.$errors" :key="error.$uid">{{ error.$message }}</small>
-            </div>
-          </div>
-          <div class="form-group">
-            <label
-              class="form-control-label"
-              v-text="t$('gatewayApp.inventarioInventario.cantidadMinima')"
-              for="inventario-cantidadMinima"
-            ></label>
-            <input
-              type="number"
-              class="form-control"
-              name="cantidadMinima"
-              id="inventario-cantidadMinima"
-              data-cy="cantidadMinima"
-              :class="{ valid: !v$.cantidadMinima.$invalid, invalid: v$.cantidadMinima.$invalid }"
-              v-model.number="v$.cantidadMinima.$model"
-              required
-            />
-            <div v-if="v$.cantidadMinima.$anyDirty && v$.cantidadMinima.$invalid">
-              <small class="form-text text-danger" v-for="error of v$.cantidadMinima.$errors" :key="error.$uid">{{ error.$message }}</small>
-            </div>
-          </div>
-          <div class="form-group">
-            <label
-              class="form-control-label"
-              v-text="t$('gatewayApp.inventarioInventario.fechaCaducidad')"
-              for="inventario-fechaCaducidad"
-            ></label>
-            <b-input-group class="mb-3">
-              <b-input-group-prepend>
-                <b-form-datepicker
-                  aria-controls="inventario-fechaCaducidad"
-                  v-model="v$.fechaCaducidad.$model"
-                  name="fechaCaducidad"
-                  class="form-control"
-                  :locale="currentLanguage"
-                  button-only
-                  today-button
-                  reset-button
-                  close-button
-                >
-                </b-form-datepicker>
-              </b-input-group-prepend>
-              <b-form-input
-                id="inventario-fechaCaducidad"
-                data-cy="fechaCaducidad"
-                type="text"
-                class="form-control"
-                name="fechaCaducidad"
-                :class="{ valid: !v$.fechaCaducidad.$invalid, invalid: v$.fechaCaducidad.$invalid }"
-                v-model="v$.fechaCaducidad.$model"
-                required
+  <div class="container-fluid py-4 bg-transparent animate__animated animate__fadeIn">
+    <div class="row justify-content-center">
+      <div class="col-md-10 col-lg-8">
+        <div class="card shadow-lg border-0 rounded-xl overflow-hidden bg-white-opacity">
+          <div class="card-header bg-vino text-white py-3">
+            <h4 class="mb-0 fw-bold">
+              <font-awesome-icon
+                :icon="inventario.id ? 'pencil-alt' : 'plus'"
+                class="me-2"
               />
-            </b-input-group>
-            <div v-if="v$.fechaCaducidad.$anyDirty && v$.fechaCaducidad.$invalid">
-              <small class="form-text text-danger" v-for="error of v$.fechaCaducidad.$errors" :key="error.$uid">{{ error.$message }}</small>
-            </div>
+
+              <span
+                id="gatewayApp.inventarioInventario.home.createOrEditLabel"
+                data-cy="InventarioCreateUpdateHeading"
+                v-text="t$('gatewayApp.inventarioInventario.home.createOrEditLabel')"
+              ></span>
+            </h4>
           </div>
-          <div class="form-group">
-            <label class="form-control-label" v-text="t$('gatewayApp.inventarioInventario.ubicacion')" for="inventario-ubicacion"></label>
-            <input
-              type="text"
-              class="form-control"
-              name="ubicacion"
-              id="inventario-ubicacion"
-              data-cy="ubicacion"
-              :class="{ valid: !v$.ubicacion.$invalid, invalid: v$.ubicacion.$invalid }"
-              v-model="v$.ubicacion.$model"
-              required
-            />
-            <div v-if="v$.ubicacion.$anyDirty && v$.ubicacion.$invalid">
-              <small class="form-text text-danger" v-for="error of v$.ubicacion.$errors" :key="error.$uid">{{ error.$message }}</small>
-            </div>
-          </div>
-          <div class="form-group">
-            <label class="form-control-label" v-text="t$('gatewayApp.inventarioInventario.controlado')" for="inventario-controlado"></label>
-            <input
-              type="checkbox"
-              class="form-check"
-              name="controlado"
-              id="inventario-controlado"
-              data-cy="controlado"
-              :class="{ valid: !v$.controlado.$invalid, invalid: v$.controlado.$invalid }"
-              v-model="v$.controlado.$model"
-              required
-            />
-            <div v-if="v$.controlado.$anyDirty && v$.controlado.$invalid">
-              <small class="form-text text-danger" v-for="error of v$.controlado.$errors" :key="error.$uid">{{ error.$message }}</small>
-            </div>
+
+          <div class="card-body p-4">
+            <form name="editForm" novalidate @submit.prevent="save()">
+              <div class="row">
+                <div class="col-12 mb-4" v-if="inventario.id">
+                  <label
+                    class="form-label small fw-bold text-muted"
+                    for="id"
+                    v-text="t$('global.field.id')"
+                  ></label>
+
+                  <input
+                    type="text"
+                    class="form-control rounded-pill bg-light border-0 px-3"
+                    id="id"
+                    name="id"
+                    v-model="inventario.id"
+                    readonly
+                  />
+                </div>
+
+                <div class="col-md-4 mb-3">
+                  <label
+                    class="form-label small fw-bold text-guinda"
+                    v-text="t$('gatewayApp.inventarioInventario.claveMedicamento')"
+                    for="inventario-claveMedicamento"
+                  ></label>
+
+                  <input
+                    type="text"
+                    class="form-control rounded-pill focus-guinda"
+                    name="claveMedicamento"
+                    id="inventario-claveMedicamento"
+                    data-cy="claveMedicamento"
+                    :class="{
+                      'is-valid':
+                        !v$.claveMedicamento.$invalid && v$.claveMedicamento.$dirty,
+
+                      'is-invalid':
+                        v$.claveMedicamento.$invalid && v$.claveMedicamento.$dirty,
+                    }"
+                    v-model="v$.claveMedicamento.$model"
+                    required
+                  />
+                </div>
+
+                <div class="col-md-8 mb-3">
+                  <label
+                    class="form-label small fw-bold text-guinda"
+                    v-text="t$('gatewayApp.inventarioInventario.nombre')"
+                    for="inventario-nombre"
+                  ></label>
+
+                  <input
+                    type="text"
+                    class="form-control rounded-pill focus-guinda"
+                    name="nombre"
+                    id="inventario-nombre"
+                    data-cy="nombre"
+                    :class="{
+                      'is-valid': !v$.nombre.$invalid && v$.nombre.$dirty,
+
+                      'is-invalid': v$.nombre.$invalid && v$.nombre.$dirty,
+                    }"
+                    v-model="v$.nombre.$model"
+                    required
+                  />
+                </div>
+
+                <div class="col-md-6 mb-3">
+                  <label
+                    class="form-label small fw-bold text-guinda"
+                    v-text="t$('gatewayApp.inventarioInventario.presentacion')"
+                    for="inventario-presentacion"
+                  ></label>
+
+                  <input
+                    type="text"
+                    class="form-control rounded-pill focus-guinda"
+                    name="presentacion"
+                    id="inventario-presentacion"
+                    data-cy="presentacion"
+                    v-model="v$.presentacion.$model"
+                    required
+                  />
+                </div>
+
+                <div class="col-md-6 mb-3">
+                  <label
+                    class="form-label small fw-bold text-guinda"
+                    v-text="t$('gatewayApp.inventarioInventario.lote')"
+                    for="inventario-lote"
+                  ></label>
+
+                  <input
+                    type="text"
+                    class="form-control rounded-pill focus-guinda"
+                    name="lote"
+                    id="inventario-lote"
+                    data-cy="lote"
+                    v-model="v$.lote.$model"
+                    required
+                  />
+                </div>
+
+                <div class="col-md-6 mb-3">
+                  <label
+                    class="form-label small fw-bold text-guinda"
+                    v-text="t$('gatewayApp.inventarioInventario.cantidad')"
+                    for="inventario-cantidad"
+                  ></label>
+
+                  <div class="input-group">
+                    <span
+                      class="input-group-text bg-light-guinda border-0 rounded-start-pill text-guinda"
+                    >
+                      <font-awesome-icon icon="cubes" />
+                    </span>
+
+                    <input
+                      type="number"
+                      class="form-control border-start-0 rounded-end-pill focus-guinda"
+                      name="cantidad"
+                      id="inventario-cantidad"
+                      v-model.number="v$.cantidad.$model"
+                      required
+                    />
+                  </div>
+                </div>
+
+                <div class="col-md-6 mb-3">
+                  <label
+                    class="form-label small fw-bold text-guinda"
+                    v-text="t$('gatewayApp.inventarioInventario.cantidadMinima')"
+                    for="inventario-cantidadMinima"
+                  ></label>
+
+                  <div class="input-group">
+                    <span
+                      class="input-group-text bg-light-ocre border-0 rounded-start-pill text-ocre"
+                    >
+                      <font-awesome-icon icon="bell" />
+                    </span>
+
+                    <input
+                      type="number"
+                      class="form-control border-start-0 rounded-end-pill focus-guinda"
+                      name="cantidadMinima"
+                      id="inventario-cantidadMinima"
+                      v-model.number="v$.cantidadMinima.$model"
+                      required
+                    />
+                  </div>
+                </div>
+
+                <div class="col-md-6 mb-3">
+                  <label
+                    class="form-label small fw-bold text-guinda"
+                    v-text="t$('gatewayApp.inventarioInventario.fechaCaducidad')"
+                    for="inventario-fechaCaducidad"
+                  ></label>
+
+                  <div class="input-group shadow-sm rounded-pill overflow-hidden border">
+                    <b-input-group-prepend>
+                      <b-form-datepicker
+                        v-model="v$.fechaCaducidad.$model"
+                        name="fechaCaducidad"
+                        button-only
+                        today-button
+                        reset-button
+                        close-button
+                        button-variant="light"
+                        class="border-0"
+                      >
+                      </b-form-datepicker>
+                    </b-input-group-prepend>
+
+                    <b-form-input
+                      id="inventario-fechaCaducidad"
+                      type="text"
+                      class="form-control border-0"
+                      name="fechaCaducidad"
+                      v-model="v$.fechaCaducidad.$model"
+                      required
+                    />
+                  </div>
+                </div>
+
+                <div class="col-md-6 mb-3">
+                  <label
+                    class="form-label small fw-bold text-guinda"
+                    v-text="t$('gatewayApp.inventarioInventario.ubicacion')"
+                    for="inventario-ubicacion"
+                  ></label>
+
+                  <input
+                    type="text"
+                    class="form-control rounded-pill focus-guinda"
+                    name="ubicacion"
+                    id="inventario-ubicacion"
+                    v-model="v$.ubicacion.$model"
+                    required
+                  />
+                </div>
+
+                <div class="col-12 mt-3 mb-4">
+                  <div class="form-check form-switch custom-switch-guinda">
+                    <input
+                      type="checkbox"
+                      class="form-check-input shadow-none"
+                      name="controlado"
+                      id="inventario-controlado"
+                      data-cy="controlado"
+                      v-model="v$.controlado.$model"
+                    />
+
+                    <label
+                      class="form-check-label fw-bold text-dark"
+                      v-text="t$('gatewayApp.inventarioInventario.controlado')"
+                      for="inventario-controlado"
+                    ></label>
+                  </div>
+                </div>
+              </div>
+
+              <div class="d-flex justify-content-end gap-3 border-top pt-4 mt-2">
+                <button
+                  type="button"
+                  id="cancel-save"
+                  class="btn btn-outline-secondary rounded-pill px-4 shadow-sm"
+                  @click="previousState()"
+                >
+                  <font-awesome-icon icon="ban" class="me-1"></font-awesome-icon>
+
+                  <span v-text="t$('entity.action.cancel')"></span>
+                </button>
+
+                <button
+                  type="submit"
+                  id="save-entity"
+                  :disabled="v$.$invalid || isSaving"
+                  class="btn btn-guinda rounded-pill px-5 shadow"
+                >
+                  <font-awesome-icon icon="save" class="me-1"></font-awesome-icon>
+
+                  <span v-text="t$('entity.action.save')"></span>
+                </button>
+              </div>
+            </form>
           </div>
         </div>
-        <div>
-          <button type="button" id="cancel-save" data-cy="entityCreateCancelButton" class="btn btn-secondary" @click="previousState()">
-            <font-awesome-icon icon="ban"></font-awesome-icon>&nbsp;<span v-text="t$('entity.action.cancel')"></span>
-          </button>
-          <button
-            type="submit"
-            id="save-entity"
-            data-cy="entityCreateSaveButton"
-            :disabled="v$.$invalid || isSaving"
-            class="btn btn-primary"
-          >
-            <font-awesome-icon icon="save"></font-awesome-icon>&nbsp;<span v-text="t$('entity.action.save')"></span>
-          </button>
-        </div>
-      </form>
+      </div>
     </div>
   </div>
 </template>
+
 <script lang="ts" src="./inventario-update.component.ts"></script>
+
+<style scoped>
+/* ESTILOS INSTITUCIONALES */
+
+.text-guinda {
+  color: #9b2247 !important;
+}
+
+.bg-vino {
+  background-color: #611232 !important;
+}
+
+.bg-light-guinda {
+  background-color: #fdf2f5;
+}
+
+.bg-light-ocre {
+  background-color: #fcf8ee;
+}
+
+.text-ocre {
+  color: #a57f2c !important;
+}
+
+.btn-guinda {
+  background-color: #9b2247;
+
+  color: white;
+
+  border: none;
+}
+
+.btn-guinda:hover {
+  background-color: #611232;
+
+  transform: translateY(-2px);
+}
+
+/* INPUTS Y DISEÑO */
+
+.rounded-xl {
+  border-radius: 20px !important;
+}
+
+.bg-white-opacity {
+  background-color: rgba(255, 255, 255, 0.95);
+
+  backdrop-filter: blur(5px);
+}
+
+.focus-guinda:focus {
+  border-color: #9b2247;
+
+  box-shadow: 0 0 0 0.25rem rgba(155, 34, 71, 0.15);
+}
+
+/* SWITCH PERSONALIZADO */
+
+.custom-switch-guinda .form-check-input:checked {
+  background-color: #9b2247;
+
+  border-color: #9b2247;
+}
+
+.form-check-input {
+  cursor: pointer;
+
+  width: 3em;
+
+  height: 1.5em;
+}
+
+.form-label {
+  margin-bottom: 0.4rem;
+
+  letter-spacing: 0.5px;
+}
+
+/* VALIDACIONES */
+
+.is-invalid {
+  border-color: #dc3545 !important;
+}
+
+.is-valid {
+  border-color: #2e7d32 !important;
+}
+</style>

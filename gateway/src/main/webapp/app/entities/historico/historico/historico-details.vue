@@ -1,108 +1,149 @@
 <template>
-  <div class="container mt-4 mb-5">
+  <div class="container-fluid py-4 bg-transparent animate__animated animate__fadeIn">
     <div class="row justify-content-center">
-      <div class="col-md-10">
-        <div v-if="historico" class="card shadow-lg border-0" id="seccion-receta">
-          <!-- HEADER -->
+      <div class="col-md-11 col-lg-9">
+        <div
+          v-if="historico"
+          class="card shadow-lg border-0 rounded-xl overflow-hidden bg-white-opacity"
+          id="seccion-receta"
+        >
           <div
-            class="card-header bg-primary text-white d-flex justify-content-between align-items-center py-3 no-print"
+            class="card-header bg-vino text-white d-flex justify-content-between align-items-center py-3 no-print"
           >
             <div>
-              <h4 class="mb-0">
-                <font-awesome-icon
-                  icon="file-invoice"
-                  class="text-info me-2"
-                ></font-awesome-icon>
-                Folio: <span class="fw-bold">{{ historico.folio }}</span>
+              <h4 class="mb-0 fw-bold">
+                <font-awesome-icon icon="file-invoice" class="text-ocre me-2" />
+                Folio:
+                <span class="badge bg-white-opacity-btn ms-1">{{ historico.folio }}</span>
               </h4>
-              <small class="text-white-50">ID de Sistema: {{ historico.id }}</small>
+              <small class="text-white-50 opacity-75"
+                >ID Sistema: {{ historico.id }}</small
+              >
             </div>
             <div class="text-end">
-              <div class="fw-bold h5 mb-0">
+              <div class="fw-bold h5 mb-0 text-ocre">
                 {{ formatDateLong(historico.fechaEmision) }}
               </div>
-              <span class="badge bg-info text-dark shadow-sm">Registro Verificado</span>
+              <span
+                class="badge bg-light-ocre text-ocre border border-ocre-light shadow-sm"
+              >
+                <font-awesome-icon icon="check-circle" class="me-1" /> Registro Verificado
+              </span>
             </div>
           </div>
 
-          <!-- PRINT HEADER -->
-          <div class="only-print text-center mb-4">
-            <h2 class="text-primary fw-bold text-uppercase">
+          <div class="only-print text-center mb-5 mt-3">
+            <h2 class="text-guinda fw-bold text-uppercase letter-spacing-2">
               Receta Médica / Comprobante de Entrega
             </h2>
-            <p class="text-muted">
-              Folio: {{ historico.folio }} | Fecha:
-              {{ formatDateLong(historico.fechaEmision) }}
-            </p>
-            <hr />
+            <div class="d-flex justify-content-center gap-4 mt-2 h6 text-muted">
+              <span><strong>Folio:</strong> {{ historico.folio }}</span>
+              <span
+                ><strong>Fecha:</strong>
+                {{ formatDateLong(historico.fechaEmision) }}</span
+              >
+            </div>
+            <div class="border-bottom border-2 border-dark mt-3 w-75 mx-auto"></div>
           </div>
 
-          <!-- BODY -->
-          <div class="card-body p-4 bg-white">
-            <!-- DATOS PACIENTE Y MÉDICO -->
-            <div class="row mb-4">
-              <div class="col-md-6 border-end border-primary-subtle printable-col">
-                <h6
-                  class="text-primary fw-bold text-uppercase border-bottom border-primary-subtle pb-2"
-                >
-                  <font-awesome-icon icon="user" class="me-2 no-print"></font-awesome-icon
-                  >Datos del Paciente
-                </h6>
-                <p class="mb-1 text-secondary">
-                  <strong>Nombre:</strong>
-                  <span class="text-dark">{{ historico.pacienteNombre }}</span>
-                </p>
-                <p class="mb-1 text-secondary">
-                  <strong>ID Paciente:</strong>
-                  <span class="text-dark">{{ historico.pacienteId }}</span>
-                </p>
-                <p class="mb-0 text-secondary">
-                  <strong>CURP:</strong>
-                  <span class="text-muted">{{
-                    historico.pacienteCurp || "No registrada"
-                  }}</span>
-                </p>
+          <div class="card-body p-4 p-md-5 bg-white">
+            <div class="row mb-5">
+              <div class="col-md-6 border-end-md printable-col mb-4 mb-md-0">
+                <div class="d-flex align-items-center mb-3">
+                  <div
+                    class="icon-box-sm bg-light-guinda text-guinda rounded-circle me-3 no-print"
+                  >
+                    <font-awesome-icon icon="user" />
+                  </div>
+                  <h6
+                    class="text-guinda fw-bold text-uppercase mb-0 border-bottom-guinda pb-1 flex-grow-1"
+                  >
+                    Datos del Paciente
+                  </h6>
+                </div>
+                <div class="ps-md-5">
+                  <p class="mb-2">
+                    <span class="text-muted small fw-bold text-uppercase d-block"
+                      >Nombre:</span
+                    >
+                    <span class="h6 fw-bold text-dark">{{
+                      historico.pacienteNombre
+                    }}</span>
+                  </p>
+                  <p class="mb-2">
+                    <span class="text-muted small fw-bold text-uppercase d-block"
+                      >ID Paciente:</span
+                    >
+                    <span class="text-dark">{{ historico.pacienteId }}</span>
+                  </p>
+                  <p class="mb-0">
+                    <span class="text-muted small fw-bold text-uppercase d-block"
+                      >CURP:</span
+                    >
+                    <span class="text-muted italic">{{
+                      historico.pacienteCurp || "No registrada"
+                    }}</span>
+                  </p>
+                </div>
               </div>
+
               <div class="col-md-6 ps-md-4 printable-col">
-                <h6
-                  class="text-info-emphasis fw-bold text-uppercase border-bottom border-info-subtle pb-2"
-                >
-                  <font-awesome-icon
-                    icon="user-md"
-                    class="me-2 no-print"
-                  ></font-awesome-icon
-                  >Datos del Médico
-                </h6>
-                <p class="mb-1 text-secondary">
-                  <strong>Nombre:</strong>
-                  <span class="text-dark">{{ historico.medicoNombre }}</span>
-                </p>
-                <p class="mb-1 text-secondary">
-                  <strong>Especialidad:</strong>
-                  <span class="text-dark">{{
-                    historico.medicoEspecialidad || "Médico General"
-                  }}</span>
-                </p>
-                <p class="mb-0 text-secondary">
-                  <strong>ID Médico:</strong>
-                  <span class="text-dark">{{ historico.medicoId }}</span>
-                </p>
+                <div class="d-flex align-items-center mb-3">
+                  <div
+                    class="icon-box-sm bg-light-ocre text-ocre rounded-circle me-3 no-print"
+                  >
+                    <font-awesome-icon icon="user-md" />
+                  </div>
+                  <h6
+                    class="text-ocre fw-bold text-uppercase mb-0 border-bottom-ocre pb-1 flex-grow-1"
+                  >
+                    Datos del Médico
+                  </h6>
+                </div>
+                <div class="ps-md-5">
+                  <p class="mb-2">
+                    <span class="text-muted small fw-bold text-uppercase d-block"
+                      >Nombre:</span
+                    >
+                    <span class="h6 fw-bold text-dark">{{ historico.medicoNombre }}</span>
+                  </p>
+                  <p class="mb-2">
+                    <span class="text-muted small fw-bold text-uppercase d-block"
+                      >Especialidad:</span
+                    >
+                    <span class="text-dark">{{
+                      historico.medicoEspecialidad || "Médico General"
+                    }}</span>
+                  </p>
+                  <p class="mb-0">
+                    <span class="text-muted small fw-bold text-uppercase d-block"
+                      >Cédula Profesional:</span
+                    >
+                    <span class="text-dark">{{ historico.medicoId }}</span>
+                  </p>
+                </div>
               </div>
             </div>
 
-            <!-- MEDICAMENTOS -->
             <div class="mt-4">
-              <h6 class="text-primary fw-bold text-uppercase mb-3">
-                <font-awesome-icon icon="pills" class="me-2 no-print"></font-awesome-icon
-                >Medicamentos Entregados
-              </h6>
-              <div class="table-responsive shadow-sm">
-                <table class="table table-hover table-bordered align-middle">
-                  <thead class="table-primary text-primary-emphasis">
+              <div class="d-flex align-items-center mb-3">
+                <div class="icon-box-sm bg-vino text-white rounded-circle me-3 no-print">
+                  <font-awesome-icon icon="pills" />
+                </div>
+                <h6 class="text-guinda fw-bold text-uppercase mb-0">
+                  Medicamentos Entregados
+                </h6>
+              </div>
+
+              <div class="table-responsive rounded-xl shadow-sm border border-light">
+                <table class="table table-hover align-middle mb-0">
+                  <thead class="bg-vino text-white text-uppercase small">
                     <tr>
-                      <th style="width: 10%">ID</th>
-                      <th>Nombre / Indicaciones</th>
-                      <th class="text-center" style="width: 20%">Cantidad</th>
+                      <th class="py-3 px-4 border-0" style="width: 10%">Clave</th>
+                      <th class="py-3 border-0">Descripción</th>
+                      <th class="py-3 text-center border-0" style="width: 20%">
+                        Cantidad
+                      </th>
                     </tr>
                   </thead>
                   <tbody>
@@ -110,31 +151,38 @@
                       <tr
                         v-for="med in parsearMeds(historico.medicamentos)"
                         :key="med.id"
+                        class="border-bottom"
                       >
-                        <td class="text-muted small">{{ med.id }}</td>
+                        <td class="px-4">
+                          <span class="badge bg-light text-muted border">{{
+                            med.id
+                          }}</span>
+                        </td>
                         <td>
-                          <div class="fw-bold text-dark">{{ med.nombre }}</div>
+                          <div class="fw-bold text-dark h6 mb-1">{{ med.nombre }}</div>
                           <div
                             v-if="med.observaciones"
-                            class="text-primary italic mt-1 small"
+                            class="text-guinda italic small d-flex align-items-start mt-1"
                           >
                             <font-awesome-icon
                               icon="info-circle"
-                              class="me-1"
-                            ></font-awesome-icon>
-                            {{ med.observaciones }}
+                              class="me-2 mt-1 no-print"
+                            />
+                            <span>{{ med.observaciones }}</span>
                           </div>
                         </td>
                         <td class="text-center">
                           <span
-                            class="badge bg-primary px-3 py-2 rounded-pill print-badge"
-                            >{{ med.cantidad }} pz.</span
+                            class="badge bg-light-guinda text-guinda px-3 py-2 rounded-pill fw-bold border border-guinda-light"
                           >
+                            {{ med.cantidad }} pz.
+                          </span>
                         </td>
                       </tr>
                     </template>
                     <tr v-else>
-                      <td colspan="3" class="text-center italic text-muted py-3">
+                      <td colspan="3" class="text-center italic text-muted py-5">
+                        <font-awesome-icon icon="exclamation-circle" class="me-2" />
                         {{ historico.medicamentos }}
                       </td>
                     </tr>
@@ -143,66 +191,71 @@
               </div>
             </div>
 
-            <!-- OBSERVACIONES Y USUARIOS -->
-            <div class="row mt-4 pt-3 border-top border-primary-subtle">
-              <div class="col-md-7 printable-col">
-                <p class="mb-1 small fw-bold text-primary text-uppercase">
-                  Observaciones Generales:
-                </p>
-                <div
-                  class="p-3 bg-primary-subtle rounded border border-primary-subtle italic text-primary-emphasis"
+            <div class="row mt-5 pt-4 border-top border-light">
+              <div class="col-md-7 printable-col mb-4 mb-md-0">
+                <label class="small fw-bold text-guinda text-uppercase mb-2 d-block"
+                  >Observaciones Generales:</label
                 >
-                  {{ historico.observaciones || "Sin observaciones registradas." }}
+                <div
+                  class="p-3 bg-light rounded-xl border border-light italic text-muted shadow-inner min-height-100"
+                >
+                  {{ historico.observaciones || "Sin observaciones adicionales." }}
                 </div>
               </div>
-              <div class="col-md-5 text-md-end pt-3 pt-md-0 printable-col">
-                <div class="mb-2">
-                  <small class="text-muted d-block text-uppercase small-font"
-                    >Usuario que Registró:</small
+              <div
+                class="col-md-5 text-md-end printable-col d-flex flex-column justify-content-center"
+              >
+                <div class="mb-3">
+                  <small class="text-muted d-block text-uppercase small-font fw-bold"
+                    >Despachado por:</small
                   >
-                  <span class="fw-bold text-primary">{{
+                  <span class="text-vino fw-bold">{{
                     historico.usuarioQueRegistro
                   }}</span>
                 </div>
                 <div>
-                  <small class="text-muted d-block text-uppercase small-font"
-                    >Autorizado por:</small
+                  <small class="text-muted d-block text-uppercase small-font fw-bold"
+                    >Autorización Digital:</small
                   >
-                  <span class="fw-bold text-info-emphasis">{{ historico.autorizo }}</span>
+                  <span class="text-ocre fw-bold">{{ historico.autorizo }}</span>
                 </div>
               </div>
             </div>
 
-            <!-- Sello de impresión -->
             <div class="only-print mt-5 pt-5">
               <div class="row text-center mt-5">
-                <div class="col-6 offset-3 border-top border-dark pt-2">
-                  <small class="text-uppercase fw-bold"
-                    >Sello y Firma de Autorización</small
+                <div class="col-5 border-top border-dark pt-2 mx-auto">
+                  <small class="text-uppercase fw-bold d-block"
+                    >Firma del Paciente / Recibe</small
+                  >
+                </div>
+                <div class="col-1"></div>
+                <div class="col-5 border-top border-dark pt-2 mx-auto">
+                  <small class="text-uppercase fw-bold d-block"
+                    >Sello de Farmacia / Despacho</small
                   >
                 </div>
               </div>
             </div>
           </div>
 
-          <!-- FOOTER BOTONES -->
-          <div class="card-footer bg-light py-3 d-flex justify-content-between no-print">
+          <div
+            class="card-footer bg-light-guinda py-3 d-flex justify-content-between no-print border-0 p-4"
+          >
             <button
               type="button"
               @click.prevent="previousState()"
-              class="btn btn-outline-secondary px-4 shadow-sm"
+              class="btn btn-outline-secondary rounded-pill px-4 shadow-sm bg-white"
             >
-              <font-awesome-icon icon="arrow-left" class="me-1"></font-awesome-icon>
-              Volver
+              <font-awesome-icon icon="arrow-left" class="me-2" /> Volver
             </button>
-            <div class="btn-group">
+            <div class="d-flex gap-2">
               <button
                 type="button"
                 @click="imprimirReceta"
-                class="btn btn-info px-4 shadow-sm fw-bold text-white me-2"
+                class="btn btn-ocre rounded-pill px-4 shadow-sm text-white fw-bold"
               >
-                <font-awesome-icon icon="print" class="me-1"></font-awesome-icon> Imprimir
-                Receta
+                <font-awesome-icon icon="print" class="me-2" /> Imprimir Comprobante
               </button>
               <router-link
                 v-if="historico.id"
@@ -210,9 +263,11 @@
                 custom
                 v-slot="{ navigate }"
               >
-                <button @click="navigate" class="btn btn-primary px-4 shadow-sm fw-bold">
-                  <font-awesome-icon icon="pencil-alt" class="me-1"></font-awesome-icon>
-                  Editar
+                <button
+                  @click="navigate"
+                  class="btn btn-guinda rounded-pill px-4 shadow-sm fw-bold"
+                >
+                  <font-awesome-icon icon="pencil-alt" class="me-2" /> Editar Registro
                 </button>
               </router-link>
             </div>
@@ -226,69 +281,131 @@
 <script lang="ts" src="./historico-details.component.ts"></script>
 
 <style scoped>
-.card-header {
-  border-bottom: 4px solid #0056b3;
+/* ESTILOS INSTITUCIONALES */
+.text-guinda {
+  color: #9b2247 !important;
 }
-.table-responsive {
-  border-radius: 8px;
+.text-vino {
+  color: #611232 !important;
 }
-.table thead th {
-  font-size: 0.85rem;
-  letter-spacing: 0.5px;
+.bg-vino {
+  background-color: #611232 !important;
 }
-.italic {
-  font-style: italic;
+.bg-light-guinda {
+  background-color: #fdf2f5;
 }
-.small-font {
-  font-size: 0.75rem;
+.border-bottom-guinda {
+  border-bottom: 2px solid #9b2247;
+}
+
+.text-ocre {
+  color: #a57f2c !important;
+}
+.bg-light-ocre {
+  background-color: #fcf8ee;
+}
+.border-bottom-ocre {
+  border-bottom: 2px solid #a57f2c;
+}
+.ocre-light {
+  border-color: rgba(165, 127, 44, 0.2) !important;
+}
+
+.btn-guinda {
+  background-color: #9b2247;
+  color: white;
+  border: none;
+}
+.btn-guinda:hover {
+  background-color: #611232;
+  transform: translateY(-1px);
+}
+.btn-ocre {
+  background-color: #a57f2c;
+  color: white;
+  border: none;
+}
+.btn-ocre:hover {
+  background-color: #846522;
+}
+
+/* DISEÑO DE TARJETA Y TABLA */
+.rounded-xl {
+  border-radius: 15px !important;
+}
+.bg-white-opacity {
+  background-color: rgba(255, 255, 255, 0.96);
+  backdrop-filter: blur(8px);
+}
+.bg-white-opacity-btn {
+  background-color: rgba(255, 255, 255, 0.15);
+  border: 1px solid rgba(255, 255, 255, 0.3);
+}
+
+.icon-box-sm {
+  width: 35px;
+  height: 35px;
+  line-height: 35px;
+  text-align: center;
+  flex-shrink: 0;
+}
+
+.min-height-100 {
+  min-height: 100px;
+}
+.shadow-inner {
+  box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.05);
 }
 
 /* --- ESTILOS DE IMPRESIÓN --- */
 .only-print {
   display: none;
 }
+.letter-spacing-2 {
+  letter-spacing: 2px;
+}
 
 @media print {
-  .no-print,
-  .btn,
-  .card-footer,
-  .card-header,
-  .navbar {
+  .no-print {
     display: none !important;
   }
-
   .only-print {
     display: block !important;
   }
-
-  .container,
-  .card,
-  .card-body {
-    width: 100% !important;
-    margin: 0 !important;
-    padding: 0 !important;
+  .card {
     border: none !important;
     box-shadow: none !important;
   }
-
+  .card-body {
+    padding: 0 !important;
+  }
+  .bg-white-opacity {
+    background: white !important;
+  }
   .printable-col {
-    width: 50% !important;
+    width: 48% !important;
     float: left !important;
   }
-
-  .card-body {
-    padding: 1cm !important;
-  }
-
-  .table-primary {
+  .table thead {
     background-color: #f8f9fa !important;
-    -webkit-print-color-adjust: exact;
-  }
-
-  .print-badge {
-    background: white !important;
     color: black !important;
-    border: 1px solid #ccc !important;
+  }
+  .badge {
+    border: 1px solid #000 !important;
+    color: black !important;
+    background: transparent !important;
+  }
+  .min-height-100 {
+    min-height: 80px;
+  }
+  @page {
+    margin: 1.5cm;
+  }
+}
+
+@media (min-width: 768px) {
+  .border-end-md {
+    border-right: 1px solid #eee;
   }
 }
 </style>

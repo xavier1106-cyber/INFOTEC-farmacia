@@ -1,12 +1,10 @@
 <template>
   <div class="container mt-4 mb-5">
-    <!-- Encabezado -->
     <h2 class="mb-4 text-center border-bottom pb-3 text-institucional fw-bold">
       <font-awesome-icon icon="history" class="me-2"></font-awesome-icon>
       Historial de Recetas Emitidas
     </h2>
 
-    <!-- Barra de acciones y filtro -->
     <div class="d-flex justify-content-between align-items-center mb-4 no-print">
       <div class="btn-group shadow-sm">
         <button
@@ -15,8 +13,13 @@
           :disabled="isFetching"
         >
           <font-awesome-icon icon="sync" :spin="isFetching"></font-awesome-icon>
-          Actualizar Lista
+          Actualizar
         </button>
+
+        <router-link to="/historico/Vista_graficas" class="btn btn-outline-stats">
+          <font-awesome-icon icon="chart-bar" class="me-1" /> Ver Estadísticas
+        </router-link>
+
         <router-link to="/buscador" class="btn btn-institucional">
           <font-awesome-icon icon="search" /> Volver al Buscador
         </router-link>
@@ -36,22 +39,21 @@
         </div>
       </div>
 
-      <router-link :to="{ name: 'HistoricoCreate' }" custom v-slot="{ navigate }">
+      <!-- <router-link :to="{ name: 'HistoricoCreate' }" custom v-slot="{ navigate }">
         <button @click="navigate" class="btn btn-success-custom shadow-sm">
           <font-awesome-icon icon="plus"></font-awesome-icon> Nueva Entrada Manual
         </button>
-      </router-link>
+      </router-link>-->
     </div>
 
-    <!-- Mensaje si no hay datos -->
     <div
       class="alert alert-info shadow-sm border-0"
       v-if="!isFetching && (!historicosFiltrados || historicosFiltrados.length === 0)"
     >
-      <span v-text="t$('gatewayApp.historicoHistorico.home.notFound')"></span>
+      <font-awesome-icon icon="info-circle" class="me-2"></font-awesome-icon>
+      No se encontraron registros que coincidan con la búsqueda.
     </div>
 
-    <!-- Tabla de históricos -->
     <div
       class="card shadow-sm border-0"
       v-if="historicosFiltrados && historicosFiltrados.length > 0"
@@ -64,7 +66,7 @@
               <th class="text-white">Paciente</th>
               <th class="text-white">Médico</th>
               <th style="min-width: 300px" class="text-white text-start">
-                Medicamentos y osbservaciones
+                Medicamentos y Observaciones
               </th>
               <th class="text-white">Responsable</th>
               <th class="text-white">Acciones</th>
@@ -113,7 +115,7 @@
                           m.cantidad
                         }}</span>
                         <b class="text-dark">{{ m.nombre }}</b>
-                        <small class="text-muted ms-2">Lote: {{ m.lote || "-" }}</small>
+                        <!-- <small class="text-muted ms-2">Lote: {{ m.lote || "-" }}</small>
                         <small class="text-muted ms-2"
                           >Caducidad: {{ m.fechaCaducidad || "-" }}</small
                         >-->
@@ -178,7 +180,6 @@
                     @click="prepareRemove(historico)"
                     variant="outline-danger"
                     class="btn-sm"
-                    v-b-modal.removeEntity
                     title="Eliminar"
                   >
                     <font-awesome-icon icon="times"></font-awesome-icon>
@@ -191,8 +192,10 @@
       </div>
     </div>
 
-    <!-- Paginación -->
-    <div v-show="historicosFiltrados && historicosFiltrados.length > 0" class="mt-4">
+    <div
+      v-show="historicosFiltrados && historicosFiltrados.length > 0 && !filtroTexto"
+      class="mt-4"
+    >
       <div class="d-flex justify-content-center">
         <jhi-item-count
           :page="page"
@@ -212,7 +215,6 @@
       </div>
     </div>
 
-    <!-- Modal eliminar -->
     <b-modal
       ref="removeEntity"
       id="removeEntity"
@@ -242,36 +244,42 @@
 <style scoped>
 /* PALETA PANTONE INSTITUCIONAL */
 .text-institucional {
-  color: #9b2247 !important; /* PANTONE 7420 C */
+  color: #9b2247 !important;
 }
-
 .bg-institucional {
   background-color: #9b2247 !important;
 }
-
 .bg-institucional-dark {
-  background-color: #611232 !important; /* PANTONE 7421 C */
+  background-color: #611232 !important;
 }
-
 .btn-institucional {
   background-color: #9b2247 !important;
   border-color: #9b2247 !important;
   color: white !important;
 }
-
 .btn-outline-institucional {
   border-color: #9b2247 !important;
   color: #9b2247 !important;
 }
-
 .btn-outline-institucional:hover {
   background-color: #9b2247 !important;
   color: white !important;
 }
-
 .btn-success-custom {
   background-color: #28a745 !important;
   border-color: #28a745 !important;
+  color: white !important;
+}
+
+/* BOTÓN ESTADÍSTICAS (Color Azul Grisáceo Profesional) */
+.btn-outline-stats {
+  border-color: #4e5d6c !important;
+  color: #4e5d6c !important;
+  background-color: transparent;
+  transition: all 0.3s ease;
+}
+.btn-outline-stats:hover {
+  background-color: #4e5d6c !important;
   color: white !important;
 }
 
@@ -281,13 +289,11 @@
   overflow-y: auto;
   scrollbar-width: thin;
 }
-
 .sticky-top {
   position: sticky;
   top: 0;
   z-index: 10;
 }
-
 .table thead th {
   font-size: 0.75rem;
   font-weight: 600;
@@ -295,14 +301,12 @@
   letter-spacing: 0.5px;
   border: none;
 }
-
 .table tbody td {
   font-size: 0.88rem;
   border-bottom: 1px solid #f0f0f0;
 }
-
 .table-hover tbody tr:hover {
-  background-color: rgba(155, 34, 71, 0.04); /* Sombra suave guinda */
+  background-color: rgba(155, 34, 71, 0.04);
   transition: background-color 0.2s ease;
 }
 
@@ -311,16 +315,13 @@
   background-color: #9b2247 !important;
   border-color: #9b2247 !important;
 }
-
 ::v-deep .page-link {
   color: #9b2247;
 }
-
 .badge {
   font-weight: 500;
   padding: 0.4em 0.6em;
 }
-
 .italic {
   font-style: italic;
 }

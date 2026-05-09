@@ -20,12 +20,19 @@ export default defineComponent({
     const isFetching = ref(false);
     const LIMITE_SATURACION = 50;
 
+    const filtroGlobal = ref('');
+    const mostrarSugerencias = ref(false);
+    
+    const showModal = ref(false);
+    const tituloModal = ref('');
+    const datosGraficaModal = ref<any>(null);
+
     const loadData = async () => {
       isFetching.value = true;
       try {
         const res = await historicoService().retrieve({ 
           page: 0, 
-          size: 500, 
+          size: 1000, 
           sort: ['fechaEmision,asc'] 
         });
         historicos.value = res.data ?? [];
@@ -38,155 +45,226 @@ export default defineComponent({
 
     onMounted(loadData);
 
-    // --- GRÁFICA 1: TENDENCIA DIARIA ---
+    // --- UTILIDAD: NORMALIZAR TEXTO (Quitar acentos y pasar a minúsculas) ---
+    const normalizar = (texto: string): string => {
+      if (!texto) return '';
+      return texto
+        .toLowerCase()
+        .normalize('NFD')
+        .replace(/[\u0300-\u036f]/g, ''); // Elimina diacríticos (acentos)
+    };
+
+    // --- LÓGICA DE AUTOCOMPLETADO CON NORMALIZACIÓN ---
+    const sugerenciasAutocompletado = computed(() => {
+      const buscador = normalizar(filtroGlobal.value);
+      if (!buscador || buscador.length < 2) return [];
+      
+      const setSugerencias = new Set<string>();
+
+      historicos.value.forEach(h => {
+        // Sugerir Pacientes
+        if (normalizar(h.pacienteNombre).includes(buscador)) setSugerencias.add(h.pacienteNombre);
+        
+        // Sugerir Médicos
+        const nombreMed = h.medico?.nombre || h.medicoNombre;
+        if (normalizar(nombreMed).includes(buscador)) setSugerencias.add(nombreMed);
+
+        // Sugerir Medicamentos
+        if (h.medicamentos) {
+          try {
+            const meds = JSON.parse(h.medicamentos);
+            meds.forEach((m: any) => {
+              if (normalizar(m.nombre).includes(buscador)) setSugerencias.add(m.nombre);
+            });
+          } catch (e) {}
+        }
+      });
+
+      return Array.from(setSugerencias).slice(0, 8);
+    });
+
+    const seleccionarSugerencia = (valor: string) => {
+      filtroGlobal.value = valor;
+      mostrarSugerencias.value = false;
+    };
+
+    // --- FILTRADO DE DATOS PARA GRÁFICAS CON NORMALIZACIÓN ---
+    const historicosFiltrados = computed(() => {
+      const buscador = normalizar(filtroGlobal.value);
+      if (!buscador) return historicos.value;
+
+      return historicos.value.filter(h => {
+        const medsStr = h.medicamentos ? normalizar(h.medicamentos) : '';
+        const medicoStr = normalizar(h.medico?.nombre || h.medicoNombre);
+        const pacienteStr = normalizar(h.pacienteNombre);
+        const autorizoStr = normalizar(h.autorizo);
+
+        return medsStr.includes(buscador) || 
+               medicoStr.includes(buscador) || 
+               pacienteStr.includes(buscador) || 
+               autorizoStr.includes(buscador);
+      });
+    });
+
+    // --- LÓGICA DE MÉTRICAS Y GRÁFICAS (Usando historicosFiltrados) ---
+    const chartControlados = computed(() => {
+      let unidadesAdmin = 0;
+      let unidadesMedicas = 0;
+
+      historicosFiltrados.value.forEach(h => {
+        if (h.medicamentos) {
+          try {
+            const listaMeds = JSON.parse(h.medicamentos);
+            listaMeds.forEach((item: any) => {
+              const cantidad = Number(item.cantidad) || 0;
+              const tieneFolio = h.autorizo && h.autorizo.trim() !== '';
+              const esAdmin = tieneFolio && (normalizar(h.autorizo).includes('admin'));
+
+              if (esAdmin) unidadesAdmin += cantidad;
+              else if (tieneFolio) unidadesMedicas += cantidad;
+            });
+          } catch (e) { }
+        }
+      });
+
+      return {
+        labels: ['controlados', 'Normales'],
+        datasets: [{
+          data: [unidadesAdmin, unidadesMedicas],
+          backgroundColor: ['#9b2247', '#3498db'], 
+          hoverOffset: 15,
+          borderWidth: 2,
+          borderColor: '#ffffff'
+        }]
+      };
+    });
+
     const chartRecetasPorDia = computed(() => {
       const counts: { [key: string]: number } = {};
-      historicos.value.forEach(h => {
+      historicosFiltrados.value.forEach(h => {
         if (h.fechaEmision) {
           const date = new Date(h.fechaEmision).toLocaleDateString('es-MX');
           counts[date] = (counts[date] || 0) + 1;
         }
       });
-      const labels = Object.keys(counts);
       return {
-        labels,
+        labels: Object.keys(counts),
         datasets: [
-          { label: 'Carga de Recetas', data: Object.values(counts), borderColor: '#3498db', backgroundColor: 'rgba(52, 152, 219, 0.1)', fill: true, tension: 0.4 },
-          { label: 'Límite', data: new Array(labels.length).fill(LIMITE_SATURACION), borderColor: '#e74c3c', borderDash: [5, 5], fill: false, pointRadius: 0 }
+          { label: 'Carga de Recetas', data: Object.values(counts), borderColor: '#9b2247', backgroundColor: 'rgba(155, 34, 71, 0.1)', fill: true, tension: 0.4 },
+          { label: 'Límite', data: new Array(Object.keys(counts).length).fill(LIMITE_SATURACION), borderColor: '#e74c3c', borderDash: [5, 5], fill: false, pointRadius: 0 }
         ]
       };
     });
 
-    // --- GRÁFICA 2: MEDICAMENTOS TOP (CORREGIDO) ---
     const chartTopMedicamentos = computed(() => {
       const medCounts: { [key: string]: number } = {};
-      historicos.value.forEach(h => {
+      historicosFiltrados.value.forEach(h => {
         if (h.medicamentos) {
           try {
-            // Validamos que sea un string con formato de array antes de intentar parsear
-            const rawMeds = h.medicamentos.trim();
-            if (rawMeds.startsWith('[') && rawMeds.endsWith(']')) {
-              const listaMeds = JSON.parse(rawMeds);
-              listaMeds.forEach((item: any) => {
-                const nombre = item.nombre || 'Desconocido';
-                const cantidad = Number(item.cantidad) || 0;
-                medCounts[nombre] = (medCounts[nombre] || 0) + cantidad;
-              });
-            }
-          } catch (e) { 
-             // Silenciamos errores de parseo para limpiar la consola de registros corruptos
-          } 
+            const listaMeds = JSON.parse(h.medicamentos);
+            listaMeds.forEach((item: any) => {
+              const nombre = item.nombre || 'Desconocido';
+              medCounts[nombre] = (medCounts[nombre] || 0) + (Number(item.cantidad) || 0);
+            });
+          } catch (e) { } 
         }
       });
       const sortedMeds = Object.entries(medCounts).sort((a, b) => b[1] - a[1]).slice(0, 5);
       return {
         labels: sortedMeds.map(m => m[0]),
-        datasets: [{ label: 'Unidades', data: sortedMeds.map(m => m[1]), backgroundColor: '#2ecc71', borderRadius: 6 }]
+        datasets: [{ label: 'Unidades', data: sortedMeds.map(m => m[1]), backgroundColor: '#9b2247', borderRadius: 6 }]
       };
     });
 
-    // --- GRÁFICA 3: CONTROLADOS (DONA) ---
-    const chartControlados = computed(() => {
-      let controlados = 0;
-      let normales = 0;
-      historicos.value.forEach(h => {
-        if (!!h.autorizo) controlados++;
-        else normales++;
-      });
-      return {
-        labels: ['Controlados', 'Normales'],
-        datasets: [{ data: [controlados, normales], backgroundColor: ['#e74c3c', '#3498db'], hoverOffset: 4 }]
-      };
-    });
-
-    // --- GRÁFICA 4: DATOS UNIFICADOS DE MÉDICOS ---
     const datosMedicos = computed(() => {
-      const stats: { [key: string]: { total: number, fechas: Set<string> } } = {};
-      historicos.value.forEach(h => {
+      const stats: { [key: string]: number } = {};
+      historicosFiltrados.value.forEach(h => {
         const nombre = h.medico?.nombre || h.medicoNombre || 'Médico Externo';
-        const fecha = h.fechaEmision ? new Date(h.fechaEmision).toLocaleDateString('es-MX') : 'S/F';
-
-        if (!stats[nombre]) stats[nombre] = { total: 0, fechas: new Set() };
-        stats[nombre].total++;
-        stats[nombre].fechas.add(fecha);
+        stats[nombre] = (stats[nombre] || 0) + 1;
       });
-
-      const listaOrdenada = Object.entries(stats)
-        .map(([nombre, data]) => ({
-          nombre,
-          total: data.total,
-          fechas: Array.from(data.fechas).sort().reverse().slice(0, 3).join(', ')
-        }))
-        .sort((a, b) => b.total - a.total);
-
+      const lista = Object.entries(stats).map(([nombre, total]) => ({ nombre, total })).sort((a, b) => b.total - a.total);
       return {
-        chartData: {
-          labels: listaOrdenada.map(m => m.nombre),
-          datasets: [{ label: 'Recetas', data: listaOrdenada.map(m => m.total), backgroundColor: '#9b59b6', borderRadius: 4 }]
-        },
-        tabla: listaOrdenada
+        chartData: { labels: lista.map(m => m.nombre), datasets: [{ label: 'Recetas', data: lista.map(m => m.total), backgroundColor: '#611232', borderRadius: 4 }] },
+        tabla: lista
       };
     });
 
-    // --- GRÁFICA 5: DATOS POR ESPECIALIDAD (ROBUSTO) ---
-    const datosEspecialidades = computed(() => {
-      const espStats: { [key: string]: { total: number, medicos: Set<string> } } = {};
+    const chartConsumoInventario = computed(() => {
+      const consumo: { [key: string]: number } = {};
+      historicosFiltrados.value.forEach(h => {
+        if (h.fechaEmision && h.medicamentos) {
+          try {
+            const lista = JSON.parse(h.medicamentos);
+            const fecha = new Date(h.fechaEmision).toLocaleDateString('es-MX');
+            let total = 0;
+            lista.forEach((item: any) => total += (Number(item.cantidad) || 0));
+            consumo[fecha] = (consumo[fecha] || 0) + total;
+          } catch (e) { }
+        }
+      });
+      return {
+        labels: Object.keys(consumo),
+        datasets: [{ label: 'Unidades Dispensadas', data: Object.values(consumo), backgroundColor: '#34495e', borderRadius: 5 }]
+      };
+    });
+
+    const onChartClick = (event: any) => {
+      const chart = event.chart;
+      const points = chart.getElementsAtEventForMode(event, 'nearest', { intersect: true }, true);
+      if (!points.length) return;
+      
+      const labelSeleccionado = chart.data.labels[points[0].index];
+      tituloModal.value = `Consumo Total de Medicamentos`;
+      const medCounts: { [key: string]: number } = {};
       
       historicos.value.forEach(h => {
-        // Mapeo flexible para capturar la especialidad desde diferentes estructuras de DTO
-        const especialidad = 
-          h.medico?.especialidad || 
-          (h as any).medicoEspecialidad || 
-          (h as any).especialidad || 
-          'General / No especificada';
-
-        const medicoNombre = h.medico?.nombre || h.medicoNombre || 'Externo';
-        
-        if (!espStats[especialidad]) {
-          espStats[especialidad] = { total: 0, medicos: new Set() };
+        if (h.medicamentos) {
+          try {
+            const lista = JSON.parse(h.medicamentos);
+            lista.forEach((m: any) => {
+              medCounts[m.nombre] = (medCounts[m.nombre] || 0) + (Number(m.cantidad) || 0);
+            });
+          } catch (e) {}
         }
-        espStats[especialidad].total++;
-        espStats[especialidad].medicos.add(medicoNombre);
       });
 
-      const listaOrdenada = Object.entries(espStats)
-        .map(([nombre, data]) => ({ 
-          nombre, 
-          total: data.total,
-          conteoMedicos: data.medicos.size 
-        }))
-        .sort((a, b) => b.total - a.total);
-
-      return {
-        chartData: {
-          labels: listaOrdenada.map(e => e.nombre),
-          datasets: [{
-            label: 'Recetas por Especialidad',
-            data: listaOrdenada.map(e => e.total),
-            backgroundColor: '#f1c40f',
-            borderRadius: 4
-          }]
-        },
-        tabla: listaOrdenada
+      const sorted = Object.entries(medCounts).sort((a, b) => b[1] - a[1]);
+      datosGraficaModal.value = {
+        labels: sorted.map(m => m[0]),
+        datasets: [{
+          label: 'Unidades',
+          data: sorted.map(m => m[1]),
+          backgroundColor: sorted.map(m => m[0] === labelSeleccionado ? '#9b2247' : '#3498db'),
+          borderRadius: 5
+        }]
       };
+      showModal.value = true;
+    };
+
+    const totalMedicamentos = computed(() => {
+      let total = 0;
+      historicosFiltrados.value.forEach(h => {
+        try {
+          const meds = JSON.parse(h.medicamentos || '[]');
+          meds.forEach((m: any) => total += (Number(m.cantidad) || 0));
+        } catch (e) {}
+      });
+      return total;
     });
 
     return {
-      historicos, isFetching, loadData,
+      historicos, historicosFiltrados, isFetching, loadData, filtroGlobal, 
+      showModal, tituloModal, datosGraficaModal, 
       chartRecetasPorDia, chartTopMedicamentos, chartControlados, 
-      datosMedicos, datosEspecialidades,
+      datosMedicos, chartConsumoInventario, onChartClick,
+      totalMedicamentos,
+      mostrarSugerencias, sugerenciasAutocompletado, seleccionarSugerencia,
       chartOptions: { responsive: true, maintainAspectRatio: false },
       horizontalOptions: { indexAxis: 'y' as const, responsive: true, maintainAspectRatio: false },
+      modalChartOptions: { indexAxis: 'y' as const, responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } } },
       donaOptions: { responsive: true, maintainAspectRatio: false, cutout: '70%' },
-      medicoOptions: {
-        responsive: true,
-        maintainAspectRatio: false,
-        scales: { 
-          y: { beginAtZero: true },
-          x: { ticks: { autoSkip: false, maxRotation: 45, minRotation: 45 } } 
-        },
-        plugins: { legend: { display: false } }
-      }
+      verticalOptions: { responsive: true, maintainAspectRatio: false },
+      medicoOptions: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } } }
     };
   }
 });

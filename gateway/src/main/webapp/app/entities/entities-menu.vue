@@ -25,6 +25,14 @@
       <font-awesome-icon icon="asterisk" />
       <span>buscador</span>
     </b-dropdown-item>
+    <b-dropdown-item to="/historico/Vista_graficas">
+      <font-awesome-icon icon="asterisk" />
+      <span>Vista Gráficas</span>
+    </b-dropdown-item>
+    <b-dropdown-item to="/inventario/graficas_inventario">
+      <font-awesome-icon icon="asterisk" />
+      <span>Vista Gráficas inventario</span>
+    </b-dropdown-item>
     <!-- jhipster-needle-add-entity-to-menu - JHipster will add entities to the menu here -->
   </div>
 </template>

@@ -1,9 +1,14 @@
 <template>
   <b-navbar data-cy="navbar" toggleable="md" type="dark" class="bg-primary">
     <b-navbar-brand class="logo" b-link to="/">
-      <span class="logo-img"></span>
-      <span v-text="t$('global.title')" class="navbar-title"></span> <span class="navbar-version">{{ version }}</span>
+      <img
+        src="/content/images/infotec3.jpg"
+        alt="Logo Infotec"
+        style="height: 40px; width: auto"
+      />
+      <span class="navbar-title"></span>
     </b-navbar-brand>
+
     <b-navbar-toggle
       right
       class="jh-navbar-toggler d-lg-none"
@@ -18,22 +23,42 @@
 
     <b-collapse is-nav id="header-tabs">
       <b-navbar-nav class="ml-auto">
-        <b-nav-item to="/" exact>
+        <!-- BOTÓN INICIO -->
+        <b-nav-item to="/" exact v-if="authenticated">
           <span>
             <font-awesome-icon icon="home" />
             <span v-text="t$('global.menu.home')"></span>
           </span>
         </b-nav-item>
-        <b-nav-item-dropdown right id="entity-menu" v-if="authenticated" active-class="active" class="pointer" data-cy="entity">
+
+        <!-- BOTÓN ENTIDADES ACTIVADO -->
+        <!-- <b-nav-item-dropdown
+          right
+          id="entity-menu"
+          v-if="
+            authenticated &&
+            hasAnyAuthority([
+              'ROLE_ADMIN',
+              'ROLE_ALMACEN',
+              'ROLE_FARMACEUTICO',
+              'ROLE_USER',
+            ])
+          "
+          active-class="active"
+          class="pointer"
+          data-cy="entity"
+        >
           <template #button-content>
             <span class="navbar-dropdown-menu">
               <font-awesome-icon icon="th-list" />
               <span class="no-bold" v-text="t$('global.menu.entities.main')"></span>
             </span>
           </template>
+
           <entities-menu></entities-menu>
-          <!-- jhipster-needle-add-entity-to-menu - JHipster will add entities to the menu here -->
-        </b-nav-item-dropdown>
+        </b-nav-item-dropdown>-->
+
+        <!-- ADMINISTRACIÓN ACTIVA -->
         <b-nav-item-dropdown
           right
           id="admin-menu"
@@ -49,49 +74,55 @@
               <span class="no-bold" v-text="t$('global.menu.admin.main')"></span>
             </span>
           </template>
-          <b-dropdown-item to="/admin/gateway" active-class="active">
-            <font-awesome-icon icon="road" />
-            <span v-text="t$('global.menu.admin.gateway')"></span>
-          </b-dropdown-item>
+
           <b-dropdown-item to="/admin/user-management" active-class="active">
             <font-awesome-icon icon="users" />
             <span v-text="t$('global.menu.admin.userManagement')"></span>
           </b-dropdown-item>
+
           <b-dropdown-item to="/admin/metrics" active-class="active">
             <font-awesome-icon icon="tachometer-alt" />
             <span v-text="t$('global.menu.admin.metrics')"></span>
           </b-dropdown-item>
+
           <b-dropdown-item to="/admin/health" active-class="active">
             <font-awesome-icon icon="heart" />
             <span v-text="t$('global.menu.admin.health')"></span>
           </b-dropdown-item>
+
           <b-dropdown-item to="/admin/configuration" active-class="active">
             <font-awesome-icon icon="cogs" />
             <span v-text="t$('global.menu.admin.configuration')"></span>
           </b-dropdown-item>
+
           <b-dropdown-item to="/admin/logs" active-class="active">
             <font-awesome-icon icon="tasks" />
             <span v-text="t$('global.menu.admin.logs')"></span>
           </b-dropdown-item>
-          <b-dropdown-item v-if="openAPIEnabled" to="/admin/docs" active-class="active">
-            <font-awesome-icon icon="book" />
-            <span v-text="t$('global.menu.admin.apidocs')"></span>
-          </b-dropdown-item>
         </b-nav-item-dropdown>
-        <b-nav-item-dropdown id="languagesnavBarDropdown" right v-if="languages && Object.keys(languages).length > 1">
-          <template #button-content>
-            <font-awesome-icon icon="flag" />
-            <span class="no-bold" v-text="t$('global.menu.language')"></span>
-          </template>
-          <b-dropdown-item
-            v-for="(value, key) in languages"
-            :key="`lang-${key}`"
-            @click="changeLanguage(key)"
-            :class="{ active: isActiveLanguage(key) }"
-          >
-            {{ value.name }}
-          </b-dropdown-item>
+
+        <!-- BOTÓN IDIOMA COMENTADO -->
+        <!--
+        <b-nav-item-dropdown
+          id="languagesnavBarDropdown"
+          right
+          v-if="languages && Object.keys(languages).length > 1"
+        >
+          ...
         </b-nav-item-dropdown>
+        -->
+
+        <!-- BOTÓN CUENTA COMENTADO -->
+        <!--
+        <b-nav-item-dropdown
+          right
+          href="javascript:void(0);"
+          id="account-menu"
+        >
+          ...
+        </b-nav-item-dropdown>
+        -->
+
         <b-nav-item-dropdown
           right
           href="javascript:void(0);"
@@ -103,30 +134,37 @@
         >
           <template #button-content>
             <span class="navbar-dropdown-menu">
+              <!-- Icono usuario -->
               <font-awesome-icon icon="user" />
+
+              <!-- Texto botón -->
               <span class="no-bold" v-text="t$('global.menu.account.main')"></span>
             </span>
           </template>
-          <b-dropdown-item data-cy="settings" to="/account/settings" v-if="authenticated" active-class="active">
+
+          <!-- Botón configuración -->
+          <!--<b-dropdown-item to="/account/settings" v-if="authenticated">
             <font-awesome-icon icon="wrench" />
             <span v-text="t$('global.menu.account.settings')"></span>
-          </b-dropdown-item>
-          <b-dropdown-item data-cy="passwordItem" to="/account/password" v-if="authenticated" active-class="active">
+          </b-dropdown-item>-->
+
+          <!-- Botón contraseña -->
+          <!--<b-dropdown-item to="/account/password" v-if="authenticated">
             <font-awesome-icon icon="lock" />
             <span v-text="t$('global.menu.account.password')"></span>
-          </b-dropdown-item>
-          <b-dropdown-item data-cy="logout" v-if="authenticated" @click="logout()" id="logout" active-class="active">
+          </b-dropdown-item>-->
+
+          <!-- Botón cerrar sesión -->
+          <b-dropdown-item v-if="authenticated" @click="logout()">
             <font-awesome-icon icon="sign-out-alt" />
             <span v-text="t$('global.menu.account.logout')"></span>
           </b-dropdown-item>
-          <b-dropdown-item data-cy="login" v-if="!authenticated" @click="openLogin()" id="login" active-class="active">
+
+          <!-- Botón iniciar sesión -->
+          <!-- <b-dropdown-item v-if="!authenticated" @click="openLogin()">
             <font-awesome-icon icon="sign-in-alt" />
             <span v-text="t$('global.menu.account.login')"></span>
-          </b-dropdown-item>
-          <b-dropdown-item data-cy="register" to="/register" id="register" v-if="!authenticated" active-class="active">
-            <font-awesome-icon icon="user-plus" />
-            <span v-text="t$('global.menu.account.register')"></span>
-          </b-dropdown-item>
+          </b-dropdown-item>-->
         </b-nav-item-dropdown>
       </b-navbar-nav>
     </b-collapse>
@@ -135,11 +173,7 @@
 
 <script lang="ts" src="./jhi-navbar.component.ts"></script>
 
-<!-- Add "scoped" attribute to limit CSS to this component only -->
 <style scoped>
-/* ==========================================================================
-    Navbar
-    ========================================================================== */
 .navbar-version {
   font-size: 0.65em;
 }
@@ -160,26 +194,7 @@
   display: inline-block;
 }
 
-/* ==========================================================================
-    Logo styles
-    ========================================================================== */
 .navbar-brand.logo {
   padding: 0 7px;
-}
-
-.logo .logo-img {
-  height: 45px;
-  display: inline-block;
-  vertical-align: middle;
-  width: 45px;
-}
-
-.logo-img {
-  height: 100%;
-  background: url('/content/images/logo-jhipster.png') no-repeat center center;
-  background-size: contain;
-  width: 100%;
-  filter: drop-shadow(0 0 0.05rem white);
-  margin: 0 5px;
 }
 </style>

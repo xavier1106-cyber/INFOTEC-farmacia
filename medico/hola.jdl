@@ -1,0 +1,13 @@
+entity Hola {
+
+    nombre String required minlength(2) maxlength(100),
+    especialidad String required minlength(3) maxlength(100),
+    telefono String minlength(10) maxlength(15),
+    turno String minlength(3) maxlength(50),
+    activo Boolean required
+}
+
+paginate Hola with pagination
+dto Hola with mapstruct
+service Hola with serviceImpl
+-jdl

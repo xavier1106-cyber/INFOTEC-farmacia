@@ -306,3 +306,26 @@ ui bootstrap tweaks
 .ribbon {
   display: none !important;
 }
+
+//* 1. Eliminar el espacio que JHipster reserva para el Navbar fijo */
+body {
+  padding-top: 0 !important;
+  margin-top: 0 !important;
+}
+
+/* 2. Quitar márgenes del contenedor principal que envuelve al router-view */
+.app-container, 
+#app-view-container {
+  padding-top: 0 !important;
+  margin-top: 0 !important;
+}
+
+/* 3. Ajustar el Navbar para que no empuje el contenido hacia abajo */
+.navbar {
+  margin-bottom: 0 !important;
+}
+
+/* 4. Si usas un wrapper específico de JHipster para el contenido */
+.main-row {
+  margin-top: 0 !important;
+}

@@ -8,6 +8,7 @@ import { useDateFormat } from '@/shared/composables';
 import { type IHistorico } from '@/shared/model/historico/historico.model';
 import { useAlertService } from '@/shared/alert/alert.service';
 
+
 export default defineComponent({
   compatConfig: { MODE: 3 },
   name: 'HistoricoDetails',
@@ -61,7 +62,6 @@ export default defineComponent({
       window.print();
     };
 
-    // ------------------------------------------
 
     return {
       ...dateFormat,

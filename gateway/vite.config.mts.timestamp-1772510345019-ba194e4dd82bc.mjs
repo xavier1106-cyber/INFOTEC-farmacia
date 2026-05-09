@@ -1,4 +1,5 @@
-// vite.config.mts
+git add .
+git commit -m "Primer commit"// vite.config.mts
 import { URL, fileURLToPath } from "node:url";
 import { existsSync } from "node:fs";
 import { defineConfig, normalizePath } from "file:///home/xavier/Documentos/infotec-farmacia/gateway/node_modules/vite/dist/node/index.js";

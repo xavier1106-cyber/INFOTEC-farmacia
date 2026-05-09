@@ -1,5 +1,6 @@
 import { type Ref, defineComponent, inject, onMounted, ref, watch, computed } from 'vue';
 import { useI18n } from 'vue-i18n';
+import { useRouter } from 'vue-router'; 
 
 import HistoricoService from './historico.service';
 import { type IHistorico } from '@/shared/model/historico/historico.model';
@@ -12,6 +13,7 @@ export default defineComponent({
   name: 'Historico',
   setup() {
     const { t: t$ } = useI18n();
+    const router = useRouter(); // Instancia del router
     const dateFormat = useDateFormat();
     const dataUtils = useDataUtils();
     const historicoService = inject('historicoService', () => new HistoricoService());
@@ -29,29 +31,38 @@ export default defineComponent({
     const historicos: Ref<IHistorico[]> = ref([]);
     const isFetching = ref(false);
 
-    // ---- NUEVO: Filtro de buscador ----
+    // ---- Filtro de buscador ----
     const filtroTexto = ref('');
 
-    // ---- Funciones ----
+    // ---- Funciones de Navegación ----
+    const irAVistaGraficas = () => {
+      router.push({ name: 'VistaGraficas' }); 
+    };
+
+    // ---- Funciones auxiliares ----
     const clear = () => {
       page.value = 1;
       filtroTexto.value = '';
       retrieveHistoricos();
     };
 
-       const esJsonValido = (texto: string): boolean => {
-        if (!texto) return false;
-        const t = texto.trim();
-        return t.startsWith('[') && t.endsWith(']');
-      };
+    const esJsonValido = (texto: string): boolean => {
+      if (!texto) return false;
+      const t = texto.trim();
+      return t.startsWith('[') && t.endsWith(']');
+    };
 
-      const parsearMeds = (texto: string): any[] => {
-        try {
-          return JSON.parse(texto);
-        } catch (e) {
-          return [];
-        }
-      };
+    const parsearMeds = (texto: string): any[] => {
+      try {
+        return JSON.parse(texto);
+      } catch (e) {
+        return [];
+      }
+    };
+
+    const normalizarTexto = (texto: string): string => {
+      return texto ? texto.normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase() : '';
+    };
 
     const sort = (): Array<any> => {
       const result = [`${propOrder.value},${reverse.value ? 'desc' : 'asc'}`];
@@ -66,7 +77,7 @@ export default defineComponent({
       try {
         const paginationQuery = {
           page: page.value - 1,
-          size: itemsPerPage.value,
+          size: filtroTexto.value ? 2000 : itemsPerPage.value,
           sort: sort(),
         };
         const res = await historicoService().retrieve(paginationQuery);
@@ -88,23 +99,27 @@ export default defineComponent({
       await retrieveHistoricos();
     });
 
-    // ---- Búsqueda local filtrada ----
     const historicosFiltrados = computed(() => {
       const lista = historicos.value || [];
       if (!filtroTexto.value) return lista;
 
-      const f = filtroTexto.value.toLowerCase().trim();
+      const f = normalizarTexto(filtroTexto.value);
+      
       return lista.filter(h => {
-        return (
-          (h.folio && h.folio.toLowerCase().includes(f)) ||
-          (h.pacienteNombre && h.pacienteNombre.toLowerCase().includes(f)) ||
-          (h.medicoNombre && h.medicoNombre.toLowerCase().includes(f))
-        );
+        const folio = normalizarTexto(h.folio || '');
+        const paciente = normalizarTexto(h.pacienteNombre || '');
+        const medico = normalizarTexto(h.medicoNombre || '');
+        
+        return folio.includes(f) || paciente.includes(f) || medico.includes(f);
       });
     });
 
-    watch(filtroTexto, () => {
-      page.value = 1; // reset de página al filtrar
+    // Watcher para recargar datos del servidor al buscar
+    watch(filtroTexto, (nuevoValor) => {
+      page.value = 1; 
+      if (nuevoValor) {
+        retrieveHistoricos(); // Dispara la carga masiva (size: 2000)
+      }
     });
 
     // ---- Eliminación ----
@@ -159,10 +174,10 @@ export default defineComponent({
     // ---- Retorno ----
     return {
       historicos,
-      historicosFiltrados, 
-      filtroTexto,          
-      esJsonValido,   
-      parsearMeds,    
+      historicosFiltrados,
+      filtroTexto,
+      esJsonValido,
+      parsearMeds,
       handleSyncList,
       isFetching,
       retrieveHistoricos,
@@ -182,6 +197,7 @@ export default defineComponent({
       changeOrder,
       t$,
       ...dataUtils,
+      irAVistaGraficas,
     };
   },
 });

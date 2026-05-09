@@ -1,5 +1,5 @@
 <template>
-  <div class="modal-body">
+  <!--<div class="modal-body">
     <div class="row justify-content-center">
       <div class="col-md-8">
         <b-alert
@@ -12,7 +12,10 @@
       </div>
       <div class="col-md-8">
         <b-form @submit.prevent="doLogin()">
-          <b-form-group :label="t$('global.form[\'username.label\']')" label-for="username">
+          <b-form-group
+            :label="t$('global.form[\'username.label\']')"
+            label-for="username"
+          >
             <b-form-input
               id="username"
               type="text"
@@ -39,7 +42,12 @@
             <span v-text="t$('login.form.rememberme')"></span>
           </b-form-checkbox>
           <div>
-            <b-button data-cy="submit" type="submit" variant="primary" v-text="t$('login.form.button')"></b-button>
+            <b-button
+              data-cy="submit"
+              type="submit"
+              variant="primary"
+              v-text="t$('login.form.button')"
+            ></b-button>
           </div>
         </b-form>
         <p></p>
@@ -56,12 +64,16 @@
         <div>
           <b-alert show variant="warning">
             <span v-text="t$('global.messages.info.register.noaccount')"></span>
-            <b-link :to="'/register'" class="alert-link" v-text="t$('global.messages.info.register.link')"></b-link>
+            <b-link
+              :to="'/register'"
+              class="alert-link"
+              v-text="t$('global.messages.info.register.link')"
+            ></b-link>
           </b-alert>
         </div>
       </div>
     </div>
-  </div>
+  </div>-->
 </template>
 
 <script lang="ts" src="./login-form.component.ts"></script>
